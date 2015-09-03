@@ -19,7 +19,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
 
 ADD hostname.txt /etc/hostname
 ADD etc-hosts.txt /etc/hosts
-RUN chown root:root /etc/hosts
 
 RUN postconf -e myhostname=mail.pennasol.su
 RUN postconf -e mydestination="mail.pennasol.su, pennasol.su, localhost.localdomain, Localhost"
@@ -29,7 +28,7 @@ RUN postconf -e mailbox_command=""
 # Add a local user to receive mail at someone@example.com, with a delivery directory
 RUN useradd -s /bin/bash office
 RUN mkdir /var/spool/mail/office
-RUN chown office:mail /var/spool/mail/office
+
 
 
 ADD etc-aliases.txt /etc/aliases
@@ -46,5 +45,8 @@ EXPOSE 25
 # RUN chmod +x startservices.sh
 
 # ENTRYPOINT ["/startservices.sh"]
+
+RUN chown root:root /etc/hosts
+RUN chown office:mail /var/spool/mail/office
 
 CMD ["sh", "-c", "service syslog-ng start ; service postfix start ; tail -F /var/log/mail.log"]
