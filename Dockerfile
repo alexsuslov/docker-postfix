@@ -17,7 +17,7 @@ RUN echo "postfix postfix/mailname string mail.pennasol.su" >> preseed.txt
 RUN debconf-set-selections preseed.txt
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
 
-RUN echo mail > /etc/hostname
+ADD hostname.txt /etc/hostname
 ADD etc-hosts.txt /etc/hosts
 RUN chown root:root /etc/hosts
 
