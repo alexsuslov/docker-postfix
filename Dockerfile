@@ -1,41 +1,43 @@
-from ubuntu:12.04
-maintainer Vo Minh Thu <noteed@gmail.com>
+FROM ubuntu:14.04
 
-run apt-get update
-run apt-get install -q -y language-pack-en
-run update-locale LANG=en_US.UTF-8
+RUN \
+	sed -i 's/# \(.*multiverse$\)/\1/g' /etc/apt/sources.list && \
+ 	apt-get update && \
+ 	apt-get -y upgrade && \
+	apt-get install -q -y language-pack-ru && \
+	update-locale LANG=ru_RU.UTF-8
 
-run echo mail > /etc/hostname
-add etc-hosts.txt /etc/hosts
-run chown root:root /etc/hosts
+RUN echo mail > /etc/hostname
+ADD etc-hosts.txt /etc/hosts
+RUN chown root:root /etc/hosts
 
-run apt-get install -q -y vim
+RUN apt-get install -q -y nano
 
 # Install Postfix.
-run echo "postfix postfix/main_mailer_type string Internet site" > preseed.txt
-run echo "postfix postfix/mailname string mail.example.com" >> preseed.txt
+RUN echo "postfix postfix/main_mailer_type string Internet site" > preseed.txt
+RUN echo "postfix postfix/mailname string mail.pennasol.su" >> preseed.txt
 # Use Mailbox format.
-run debconf-set-selections preseed.txt
-run DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
+RUN debconf-set-selections preseed.txt
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
 
-run postconf -e myhostname=mail.example.com
-run postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost"
-run postconf -e mail_spool_directory="/var/spool/mail/"
-run postconf -e mailbox_command=""
+RUN postconf -e myhostname=mail.pennasol.su
+RUN postconf -e mydestination="mail.pennasol.su, pennasol.su, localhost.localdomain, localhost"
+RUN postconf -e mail_spool_directory="/var/spool/mail/"
+RUN postconf -e mailbox_command=""
 
 # Add a local user to receive mail at someone@example.com, with a delivery directory
 # (for the Mailbox format).
-run useradd -s /bin/bash someone
-run mkdir /var/spool/mail/someone
-run chown someone:mail /var/spool/mail/someone
+RUN useradd -s /bin/bash office
+RUN mkdir /var/spool/mail/office
+RUN chown office:mail /var/spool/mail/office
 
-add etc-aliases.txt /etc/aliases
-run chown root:root /etc/aliases
-run newaliases
+ADD etc-aliases.txt /etc/aliases
+RUN chown root:root /etc/aliases
+RUN newaliases
 
 # Use syslog-ng to get Postfix logs (rsyslog uses upstart which does not seem
-# to run within Docker).
-run apt-get install -q -y syslog-ng
+# to rum within Docker).
+RUN apt-get install -q -y syslog-ng
 
-expose 25
-cmd ["sh", "-c", "service syslog-ng start ; service postfix start ; tail -F /var/log/mail.log"]
+EXPOSE 25
+CMD ["sh", "-c", "service syslog-ng start ; service postfix start ; tail -F /var/log/mail.log"]
