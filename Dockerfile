@@ -10,15 +10,16 @@ RUN apt-get -y upgrade
 RUN apt-get install -q -y language-pack-ru
 RUN update-locale LANG=ru_RU.UTF-8
 
-RUN echo mail > /etc/hostname
-ADD etc-hosts.txt /etc/hosts
-RUN chown root:root /etc/hosts
 # Install Postfix.
 RUN echo "postfix postfix/main_mailer_type string Internet site" > preseed.txt
 RUN echo "postfix postfix/mailname string mail.pennasol.su" >> preseed.txt
 # Use Mailbox format.
 RUN debconf-set-selections preseed.txt
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
+
+RUN echo mail > /etc/hostname
+ADD etc-hosts.txt /etc/hosts
+RUN chown root:root /etc/hosts
 
 RUN postconf -e myhostname=mail.pennasol.su
 RUN postconf -e mydestination="mail.pennasol.su, pennasol.su, localhost.localdomain, Localhost"
