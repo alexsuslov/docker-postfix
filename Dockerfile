@@ -17,6 +17,7 @@ RUN echo "postfix postfix/mailname string mail.pennasol.su" >> preseed.txt
 RUN debconf-set-selections preseed.txt
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
 
+USER root
 ADD hostname.txt /etc/hostname
 ADD etc-hosts.txt /etc/hosts
 
@@ -24,12 +25,6 @@ RUN postconf -e myhostname=mail.pennasol.su
 RUN postconf -e mydestination="mail.pennasol.su, pennasol.su, localhost.localdomain, Localhost"
 RUN postconf -e mail_spool_directory="/var/spool/mail/"
 RUN postconf -e mailbox_command=""
-
-# Add a local user to receive mail at someone@example.com, with a delivery directory
-RUN useradd -s /bin/bash office
-RUN mkdir /var/spool/mail/office
-
-
 
 ADD etc-aliases.txt /etc/aliases
 RUN chown root:root /etc/aliases
@@ -40,13 +35,19 @@ RUN apt-get install -q -y syslog-ng-core syslog-ng syslog-ng-mod-smtp
 
 EXPOSE 25
 
+# Add a local user to receive mail at someone@example.com, with a delivery directory
+RUN useradd -s /bin/bash office
+USER office
+RUN mkdir /var/spool/mail/office
+
+
 # ADD conf/main.cf /
 # ADD conf/startservices.sh /
 # RUN chmod +x startservices.sh
 
 # ENTRYPOINT ["/startservices.sh"]
 
-RUN chown root:root /etc/hosts
-RUN chown office:mail /var/spool/mail/office
+# RUN chown root:root /etc/hosts
+# RUN chown office:mail /var/spool/mail/office
 
 CMD ["sh", "-c", "service syslog-ng start ; service postfix start ; tail -F /var/log/mail.log"]
