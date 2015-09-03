@@ -35,11 +35,11 @@ RUN apt-get install -q -y syslog-ng-core syslog-ng syslog-ng-mod-smtp
 
 EXPOSE 25
 
+VOLUME /var/spool/mail/
+
 # Add a local user to receive mail at someone@example.com, with a delivery directory
 RUN useradd -s /bin/bash office
-USER office
-RUN mkdir /var/spool/mail/office
-
+VOLUME /var/spool/mail/
 
 # ADD conf/main.cf /
 # ADD conf/startservices.sh /

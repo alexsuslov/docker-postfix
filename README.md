@@ -6,7 +6,7 @@ docker build -t pennasol/postfix .
 ```
 ## Run
 ```
-docker run -p 25:25 -v `pwd`/maildirs:/var/mail pennasol/postfix
+docker run -p 25:25 -v /var/spool/mail/:/var/spool/mail/ pennasol/postfix
 ```
 ## Run as demon
 ```
