@@ -10,7 +10,7 @@ docker run -p 25:25 -v /var/spool/mail/:/var/spool/mail/ pennasol/postfix
 ```
 ## Run as demon
 ```
-docker run -d --name postfix -p 25:25 -v `pwd`/maildirs:/var/mail pennasol/postfix
+docker run -d --name postfix -p 25:25 -v /var/spool/mail/:/var/spool/mail/ pennasol/postfix
 ```
 ## Clean
 ```
